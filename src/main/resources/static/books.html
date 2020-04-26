@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <!-- Кодировка веб-страницы -->
+    <meta charset="utf-8">
+    <!-- Настройка viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Подключаем Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>БИБЛИОТЕКА</title>
+</head>
+<body>
+<!-- Подключаем jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<!-- Подключаем плагин Popper -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<!-- Подключаем Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+<!-- Контент страницы -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Books</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/index.html">~ <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/users">Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/authors">Authors</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div>
+    <H2>All Books</H2>
+</div>
+
+<div class="container">
+    <div class="row">
+        <table id="myTable" border="1" class="table">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>ISBN</th>
+                <th>Author</th>
+            </tr>
+        </table>
+    </div>
+    <div class="row">
+        <!-- ФОРМА ДОБАВЛЕНИЯ -->
+
+        <div class="col-sm-6">
+
+        <form id="add_form" action="">
+                <div class="form-group">
+
+                <input class="form-control" style="margin: 10px" type="text" placeholder="Name" name="name" required>
+                <input class="form-control" style="margin: 10px" type="text" placeholder="ISBN" name="isbn" required>
+                <input class="form-control" style="margin: 10px" type="text" placeholder="Pages" name="pages" required>
+                <input class="form-control" style="margin: 10px" type="text" placeholder="Cover Type" name="coverType" required>
+
+                <div>
+                    <button type="button" id="addBook" class="btn btn-primary" style="padding: 5px">Add new</button>
+                </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <form>
+                <div class="form-group">
+                    <label for="authorsList">Example multiple select</label>
+                    <select multiple class="form-control" id="authorsList">
+<!--                        <option value='i1'>1</option>-->
+<!--                        <option value='i2'>2</option>-->
+<!--                        <option value='i3'>3</option>-->
+<!--                        <option value='i4'>4</option>-->
+<!--                        <option value='i5'>5</option>-->
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+    var arrSelected = []; // готовим пусмтой массив
+    getAllBooks(); // загрузить все книги
+    getAllAuthors(); // загрузить авторов
+
+    // обработка эвента кнопки Добавить.
+    $('#addBook').on('click', function (event) {
+        event.preventDefault();
+        addNew();
+    });
+
+    // обработка эвента мульти-выделения элементов в списке добавляемых авторов.
+    $('#authorsList').on('change', function(){ // стандартная "обертка" обработки эвента в JQ.
+        arrSelected.length = 0;
+        var selected = $(this).find("option:selected"); // "ищем выбранный элемент"
+        selected.each(function(){ // интерируемся по выбранному
+            arrSelected.push(parseInt($(this).attr('value'))); // в массив пихаем свойства text и невидимое свойство value.
+        });
+    });
+
+
+    // Получить все книги
+    function getAllBooks() {
+        $.getJSON("http://localhost:8080/api/book/all", function (data) {
+            var dataToInsert = '';
+            $.each(data.bookList, function (key, value) {
+                console.log('id' + value.id);
+                dataToInsert = '<tr>';
+                dataToInsert += '<td>' + value.id + '</td>';
+                dataToInsert += '<td>' + value.name + '</td>';
+                dataToInsert += '<td>' + value.isbn + '</td>';
+                dataToInsert += '<td>' + value.author + '</td>';
+                dataToInsert += '</tr>';
+            });
+            $("#myTable").append(dataToInsert);
+        });
+    }
+
+    // Получить всех авторов
+    function getAllAuthors() {
+
+      //  $("#myTable > tbody").empty(); // сюда добавил очистку всех внутренностей тега tbody
+        $.getJSON("http://localhost:8080/api/author/all", function (data) {
+            var dataToInsert = '';
+            $.each(data.authorList, function (key, value) {
+                console.log('id = ' + value.id);
+                dataToInsert = '<option ';
+                dataToInsert += 'value=' + value.id + '>';
+                dataToInsert += value.russianName;
+                dataToInsert += '</option>';
+                $("#authorsList").append(dataToInsert);
+            });
+        });
+    }
+
+    // Удалить книгу.
+    function deleteBook(id) {
+        $.ajax({
+            url: "http://localhost:8080/api/book?id=" + id,
+            type: "DELETE",
+            success: function () {
+                getAllBooks();
+            }
+        });
+    }
+
+    function prepareFormAndListDataInJson() { // вынес сериализацию формы в JSON  в отдельную ф-цию. В статье и видео я дам ссылку на весь код на ГитХабе
+        var frm = $("#add_form").serializeArray(); // хватаем форму по id. Сериализуем в массив
+        var obj = {}; // создаем пустой объект
+        for (var a = 0; a < frm.length; a++) { // бегаем по форме (по массиву)
+            obj[frm[a].name] = frm[a].value; // добавляем в объект элементы массива
+        }
+        obj['authorIdList'] = arrSelected;
+        return JSON.stringify(obj); // преобразуем в JSON
+    }
+
+
+
+    // Добавить книгу
+    function addNew() {
+
+        $.ajax({
+            url: "http://localhost:8080/api/book/add",
+            type: "POST",
+            data: prepareFormAndListDataInJson(),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+                getAllBooks();
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
