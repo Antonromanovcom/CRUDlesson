@@ -1,15 +1,17 @@
 package com.antonromanov.springboot.crud.librarycrud.domain.reader;
 
-import com.antonromanov.springboot.crud.librarycrud.domain.book.Book;
 import com.antonromanov.springboot.crud.librarycrud.domain.order.BookOrder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table
-@Getter
+@Data
+@NoArgsConstructor
 public class Reader {
 	@Id
 	@Column
@@ -18,7 +20,7 @@ public class Reader {
 	private long id;
 
 	@Column
-	private String fullName;
+	private String fName;
 
 	@Column
 	private String phone;
@@ -30,4 +32,17 @@ public class Reader {
 	@Column
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "reader")
 	private List<BookOrder> orders;
+
+	public Reader(ReaderController.ReaderDTO dto) {
+		this.fName = dto.getFName();
+		this.phone = dto.getPhone();
+		this.address = dto.getAddress();
+	}
+
+	/**
+	 * 	Репозиторий.
+	 */
+	public interface Repo extends JpaRepository<Reader, Long> {
+		//List<Reader> findAllByIdIn(Set<Long> ids);
+	}
 }

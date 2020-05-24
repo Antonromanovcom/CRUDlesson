@@ -42,7 +42,9 @@ public class Author {
 		this.englishName = dto.getEName();
 	}
 
-	// Репозиторий
+	/**
+	 * 	Репозиторий.
+	 */
 	public interface Repo extends JpaRepository<Author, Long> {
 		List<Author> findAllByIdIn(Set<Long> ids);
 	}

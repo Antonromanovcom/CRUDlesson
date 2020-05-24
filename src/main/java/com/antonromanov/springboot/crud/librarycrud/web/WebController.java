@@ -16,9 +16,9 @@ public class WebController {
 		return "books";
 	}
 
-	@GetMapping("/users")
+	@GetMapping("/readers")
 	public String usersPage() {
-		return "users";
+		return "readers";
 	}
 
 	@GetMapping("/authors")
